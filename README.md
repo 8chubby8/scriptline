@@ -40,7 +40,7 @@ Good to know:
 - **See everything:** click **Fit all**.
 - **Keyboard:** **+** and **−** zoom, the arrow keys move, and **F** fits all.
 
-As you zoom in, more detailed entries fade into view on rows further from the ruler. Zoom back out and they fade away again, while the broad entries stay.
+As you zoom in, more detailed entries fade into view on rows next to the ruler, pushing the broader entries outward. Whichever level of detail is newest on screen is drawn larger. Zoom back out and the detailed entries fade away again, while the broad entries stay.
 
 ## Reading an entry
 

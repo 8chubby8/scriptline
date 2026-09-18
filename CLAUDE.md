@@ -29,13 +29,14 @@ Decisions made and the reasoning behind them. Revisit deliberately, not by accid
 
 ### Nesting and layout
 
-- **Nesting is drawn visually**, not hidden behind interaction. A parent is a coloured band spanning its time range, acting as a header, with its children on the rows further from the date ruler, within that span.
+- **Nesting is drawn visually**, not hidden behind interaction. A parent is a coloured band spanning its time range, acting as a header, with its children on the rows nearer the date ruler, within that span.
 - A parent with no end date fades out at its right-hand edge rather than closing with a hard line — reads as "continues, or unknown".
 - A child falling outside its parent's span is shown honestly rather than hidden. That's a real tension in the chronology and seeing it is the point.
-- **Tier fixes vertical position.** Tier 1 on the row nearest the date ruler, deeper tiers on rows further out, at consistent heights across the whole timeline. Reading away from the ruler is reading broad → specific.
-- Zooming in makes new rows appear *further out* than existing ones; rows already on screen don't move or reshuffle. Calm, predictable, and matches "broader tiers don't disappear".
+- **Tier fixes vertical order.** Tier 1 on the rows furthest from the date ruler, deeper tiers on rows nearer it. Reading towards the ruler is reading broad → specific. (Changed 2026-09-19 at the owner's request — originally tier 1 sat next to the ruler.)
+- **Zooming in, each new tier grows out of the ruler side and pushes the broader tiers outward.** Zoomed fully out, tier 1 sits right by the ruler.
+- **The most detailed tier on screen is drawn larger** (about 1.6×) so it stands out; it shrinks back to normal as the next tier fades in. Zoomed out, tier 1 is big; zoomed in, the finest detail is. Owner's request, 2026-09-19.
 - Each track has its own stack of rows.
-- **The two tracks are mirrored around a central date ruler.** Biblical history above the ruler, stacking upward; world history below it, stacking downward. Chosen over stacking both tracks top-to-bottom: the two tier-1 rows sit side by side across the ruler, so the broadest events of both histories are directly comparable — the core purpose of the app.
+- **The two tracks are mirrored around a central date ruler.** Biblical history above the ruler, stacking upward; world history below it, stacking downward. Chosen over stacking both tracks top-to-bottom: matching tiers sit mirrored across the ruler, so events of both histories are directly comparable — the core purpose of the app.
 - **Tiers fade in by zoom level**: tier 1 always shows; tiers 2, 3 and 4 fade in as the visible span shrinks past roughly 2,500, 500 and 100 years. Starting defaults — tune by feel.
 - **Zoom limits**: from about 12,000 years across the screen (fully out) to about 18 days (fully in). The ruler switches from years to months to days as you zoom.
 - **Two tracks for now, more possible later.** Tracks are defined as a list in the code (`js/model.js`), so a third could be added without a rewrite; the mirrored layout would need rethinking at that point.

@@ -1,7 +1,8 @@
 'use strict';
 
-// The painted timeline. Two tracks mirrored around a central date ruler: tier 1 sits next to the
-// ruler and deeper tiers stack outward, so reading away from the ruler is reading broad → specific.
+// The painted timeline. Two tracks mirrored around a central date ruler: tier 1 sits furthest out
+// and deeper tiers appear between it and the ruler as you zoom in, pushing it outward. Whichever
+// tier is currently the most detailed on screen is drawn larger, so it stands out.
 class SLTimeline {
   static LANE_H = 30;          // height of one lane (row) of entries
   static BAR_H = 24;           // height of an entry's bar within its lane
@@ -9,6 +10,7 @@ class SLTimeline {
   static RULER_H = 40;
   // A tier fades in as the visible span shrinks from 1.6× to 1× this many years.
   static TIER_SPAN = { 1: Infinity, 2: 2500, 3: 500, 4: 100 };
+  static PROMINENT = 1.6;      // size of the most detailed tier on screen, relative to the others
   static MIN_SPAN = 0.05;      // most zoomed in: about 18 days across the screen
   static MAX_SPAN = 12000;     // most zoomed out: 12,000 years across the screen
   static MIN_V = -10000;
@@ -58,11 +60,10 @@ class SLTimeline {
     }
 
     // Lanes: within a tier, entries overlapping in time are nudged into extra lanes.
-    // Lane counts come from the whole dataset, so rows never move while zooming or panning.
-    this.tierOffset = {};
+    // Lane counts come from the whole dataset, so rows never reshuffle while panning.
+    this.laneCount = {};
     for (const t of SLModel.TRACKS) {
-      this.tierOffset[t.id] = {};
-      let offset = 0;
+      this.laneCount[t.id] = {};
       for (let tier = 1; tier <= 4; tier++) {
         const list = items.filter(i => i.track === t.id && i.tier === tier).sort((a, b) => a.s - b.s);
         const laneEnds = [];
@@ -77,28 +78,55 @@ class SLTimeline {
           const inLane = list.filter(i => i.lane === l);
           inLane.forEach((i, n) => { i.nextS = n + 1 < inLane.length ? inLane[n + 1].s : Infinity; });
         }
-        this.tierOffset[t.id][tier] = offset;
-        offset += lanes * SLTimeline.LANE_H + SLTimeline.TIER_GAP;
+        this.laneCount[t.id][tier] = laneEnds.length;
       }
-      this.trackHeight[t.id] = offset;
     }
 
     this.items = items;
     this.itemById = itemById;
+    this.layoutSpan = null;
     this.invalidate();
   }
 
-  // Signed distance of an item's bar top from the ruler's centre line.
-  relY(i) {
-    const dir = SLModel.track(i.track).dir;
-    const dist = SLTimeline.RULER_H / 2 + 8 + this.tierOffset[i.track][i.tier] + i.lane * SLTimeline.LANE_H;
-    return dir < 0 ? -(dist + SLTimeline.BAR_H) : dist;
+  // Row positions for a given zoom. Stacking outward from the ruler: tier 4, 3, 2, then 1.
+  // A tier fading in grows out of the ruler side and pushes the broader tiers outward.
+  // The most detailed tier showing is drawn at PROMINENT size, shrinking as the next one arrives.
+  layout(span = this.cssW / this.ppy) {
+    if (this.layoutSpan === span) return;
+    this.layoutSpan = span;
+    const T = SLTimeline;
+    this.tierPos = {};
+    for (const t of SLModel.TRACKS) {
+      this.tierPos[t.id] = {};
+      const lanes = (this.laneCount && this.laneCount[t.id]) || {};
+      let offset = 0;
+      let deeper = 0;   // how far a more detailed tier (with entries) has faded in
+      for (let tier = 4; tier >= 1; tier--) {
+        const a = this.tierAlpha(tier, span);
+        const k = (T.PROMINENT + (1 - T.PROMINENT) * deeper) * a;
+        this.tierPos[t.id][tier] = { offset, k };
+        if (lanes[tier]) {
+          offset += lanes[tier] * T.LANE_H * k + T.TIER_GAP * a;
+          deeper = Math.max(deeper, a);
+        }
+      }
+      this.trackHeight[t.id] = offset;
+    }
   }
 
-  tierAlpha(tier) {
+  // Signed distance of an item's bar top from the ruler's centre line, and its bar height.
+  place(i, span) {
+    this.layout(span);
+    const T = SLTimeline;
+    const p = this.tierPos[i.track][i.tier];
+    const barH = T.BAR_H * p.k;
+    const dist = T.RULER_H / 2 + 8 + p.offset + i.lane * T.LANE_H * p.k;
+    return { rel: SLModel.track(i.track).dir < 0 ? -(dist + barH) : dist, barH, k: p.k };
+  }
+
+  tierAlpha(tier, span = this.cssW / this.ppy) {
     const T = SLTimeline.TIER_SPAN[tier];
     if (T === Infinity) return 1;
-    const span = this.cssW / this.ppy;
     return Math.min(1, Math.max(0, (T * 1.6 - span) / (T * 0.6)));
   }
 
@@ -120,6 +148,7 @@ class SLTimeline {
     const T = SLTimeline;
     this.ppy = Math.min(this.cssW / T.MIN_SPAN, Math.max(this.cssW / T.MAX_SPAN, this.ppy));
     this.center = Math.min(T.MAX_V, Math.max(T.MIN_V, this.center));
+    this.layout();
     const room = this.cssH / 2 - T.RULER_H / 2 - 30;
     const up = Math.max(0, (this.trackHeight.bible || 0) - room);
     const down = Math.max(0, (this.trackHeight.world || 0) - room);
@@ -190,7 +219,7 @@ class SLTimeline {
     if (!i) return;
     const T = SLTimeline;
     const span = Math.min(Math.max((i.end - i.s) * 1.8, T.MIN_SPAN * 2, 20), T.TIER_SPAN[i.tier] * 0.9);
-    const y = this.cssH / 2 + this.panY + this.relY(i);
+    const y = this.cssH / 2 + this.panY + this.place(i, span).rel;
     let panY = this.panY;
     if (y < 50) panY += 70 - y;
     if (y > this.cssH - 70) panY -= y - (this.cssH - 90);
@@ -359,8 +388,9 @@ class SLTimeline {
     const narrow = x1 - x0 < 6;
     const bx = narrow ? (x0 + x1) / 2 - 3 : x0;
     const bw = narrow ? 6 : x1 - x0;
-    const y = rulerY + this.relY(i);
-    if (y + T.BAR_H < 0 || y > this.cssH) return;
+    const { rel, barH, k } = this.place(i);
+    const y = rulerY + rel;
+    if (y + barH < 0 || y > this.cssH || barH < 1) return;
 
     const rgb = hexToRgb(i.colour);
     const strong = i.tier === 1 ? 0.5 : 0.3;
@@ -382,27 +412,28 @@ class SLTimeline {
 
     ctx.globalAlpha = alpha;
     ctx.fillStyle = stops(strong);
-    roundRect(ctx, bx, y, bw, T.BAR_H, 4);
+    roundRect(ctx, bx, y, bw, barH, 4);
     ctx.fill();
     // A firm stripe of family colour along the edge nearest the ruler.
     ctx.fillStyle = stops(0.95);
     const dir = SLModel.track(i.track).dir;
-    ctx.fillRect(bx, dir < 0 ? y + T.BAR_H - 3 : y, bw, 3);
+    ctx.fillRect(bx, dir < 0 ? y + barH - 3 : y, bw, 3);
 
     // Label: sticks to the left edge of the screen while its bar is partly off-screen,
     // and may run past a short bar up to where the next entry in the lane begins.
-    ctx.font = i.tier === 1 ? '600 13px system-ui, sans-serif' : '12.5px system-ui, sans-serif';
+    const fontPx = (i.tier === 1 ? 13 : 12.5) * k;
+    ctx.font = (i.tier === 1 ? '600 ' : '') + fontPx.toFixed(1) + 'px system-ui, sans-serif';
     const text = i.e.title || '(untitled)';
     const tw = ctx.measureText(text).width;
     const lx = Math.max(bx + 6, Math.min(6, bx + bw - tw - 6));
     const clipR = Math.min(Number.isFinite(i.nextS) ? this.toX(i.nextS) - 6 : W, W);
-    if (clipR - lx > 14) {
+    if (clipR - lx > 14 && fontPx >= 8) {
       ctx.save();
       ctx.beginPath();
-      ctx.rect(lx - 2, y, clipR - lx + 2, T.BAR_H);
+      ctx.rect(lx - 2, y, clipR - lx + 2, barH);
       ctx.clip();
       ctx.fillStyle = '#1f2328';
-      ctx.fillText(text, lx, y + T.BAR_H / 2 + 4.5);
+      ctx.fillText(text, lx, y + barH / 2 + fontPx * 0.35);
       ctx.restore();
     }
 
@@ -410,11 +441,11 @@ class SLTimeline {
     if (this.hoverId === i.id) {
       ctx.strokeStyle = 'rgba(31, 35, 40, 0.55)';
       ctx.lineWidth = 1.5;
-      roundRect(ctx, bx - 1, y - 1, hitR - bx + 2, T.BAR_H + 2, 5);
+      roundRect(ctx, bx - 1, y - 1, hitR - bx + 2, barH + 2, 5);
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
-    if (alpha > 0.3) this.hits.push({ id: i.id, x: bx, y, w: hitR - bx, h: T.BAR_H });
+    if (alpha > 0.3) this.hits.push({ id: i.id, x: bx, y, w: hitR - bx, h: barH });
   }
 
   drawRuler(rulerY, ticks) {
