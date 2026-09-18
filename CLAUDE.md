@@ -96,12 +96,21 @@ Decisions made and the reasoning behind them. Revisit deliberately, not by accid
 ## Tech Stack
 
 - Static, browser-based site — no backend.
-- Timeline rendering: painted by us (canvas), with a small pan/zoom input helper. Not vis-timeline or similar.
+- Timeline rendering: painted by us (canvas). Pan/zoom is currently hand-written; a small helper library may replace it. Not vis-timeline or similar.
 - UI (cards, forms, panels, list view): ordinary HTML.
 - Data: JSON, versioned, stored in IndexedDB per-user — no accounts, no server.
 - Hosting: GitHub Pages.
-- Export/import: JSON, one file per entry, plus a referenced pictures folder. Used for moving data between devices and sharing individual entries.
+- Backup/restore: one zip file (JSON per entry + pictures folder inside), built with our own small zip code. Used for safety and for moving data between devices.
+- No build step and no dependencies: plain HTML, CSS and classic `<script>` files, so `index.html` also works when double-clicked from a downloaded copy.
 - For the project owner specifically: folder sync on Chrome → git commit to a personal repo as remote backup, rather than live API sync.
+
+## Current State (2026-09-18)
+
+- **Live:** https://8chubby8.github.io/scriptline/ — repo https://github.com/8chubby8/scriptline (public, GitHub Pages from `main`, root folder). Pushing to `main` updates the live site in a minute or two.
+- **Built:** the first prototype, covering everything in CHANGELOG.md — timeline, cards, edit form, list view, settings, sample entries, backup/restore, and the persistent-storage request.
+- **Files:** `index.html`, `css/style.css`, and `js/` — `dates.js` (our date format), `store.js` (IndexedDB, data version + upgrades), `model.js` (tracks, families, colours), `timeline.js` (canvas painter + input), `zip.js` + `backup.js` (backup/restore), `samples.js`, `app.js` (cards, form, list, settings).
+- **Testing:** no Node on this machine. Tested with Playwright + headless Firefox in a throwaway Python venv in the session scratchpad, serving the folder with `python3 -m http.server`. Recreate as needed; never add test tooling to the repo.
+- **Next up:** see ROADMAP.md — the owner is trying the prototype and will report what to tune.
 
 ## Open Questions
 
