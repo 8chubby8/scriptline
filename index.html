@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scriptline</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="brand">Scriptline</h1>
+    <div class="actions">
+      <button id="btn-new" class="btn primary">+ New entry</button>
+      <span class="zoom-controls">
+        <button id="btn-fit" class="btn" title="Show every entry">Fit all</button>
+        <button id="btn-zoom-out" class="btn icon" title="Zoom out" aria-label="Zoom out">−</button>
+        <button id="btn-zoom-in" class="btn icon" title="Zoom in" aria-label="Zoom in">+</button>
+      </span>
+      <button id="btn-list" class="btn" aria-pressed="false">List</button>
+      <button id="btn-settings" class="btn">Settings</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="timeline-wrap">
+      <canvas id="timeline" aria-label="Timeline. Use the list view for a text version."></canvas>
+      <div id="empty" class="empty" hidden>
+        <h2>Your timeline is empty</h2>
+        <p>Scriptline starts blank. You build your own chronology, one entry at a time.</p>
+        <div class="empty-actions">
+          <button id="btn-first" class="btn primary">Add your first entry</button>
+          <button id="btn-samples" class="btn">Try it with sample entries</button>
+        </div>
+        <p class="muted small">Sample entries can be removed again from Settings.</p>
+      </div>
+    </div>
+
+    <aside id="list-panel" class="list-panel" aria-label="All entries">
+      <div class="list-tools">
+        <input id="list-search" type="search" placeholder="Search entries…" aria-label="Search entries">
+        <div class="list-filters">
+          <select id="list-track" aria-label="Track">
+            <option value="">Both tracks</option>
+            <option value="bible">Biblical</option>
+            <option value="world">World</option>
+          </select>
+          <select id="list-sort" aria-label="Sort by">
+            <option value="date">By date</option>
+            <option value="title">By title</option>
+            <option value="updated">Recently changed</option>
+          </select>
+        </div>
+      </div>
+      <ul id="list" class="list"></ul>
+    </aside>
+  </main>
+
+  <div id="overlay" class="overlay" hidden></div>
+  <div id="lightbox" class="lightbox" hidden></div>
+
+  <dialog id="settings" class="settings">
+    <form method="dialog">
+      <h2>Settings</h2>
+      <fieldset>
+        <legend>Date notation</legend>
+        <label><input type="radio" name="era" value="BCE"> BCE / CE</label>
+        <label><input type="radio" name="era" value="BC"> BC / AD</label>
+        <p class="muted small">Only changes how dates are shown. Your entries are not altered.</p>
+      </fieldset>
+      <div id="sample-row" hidden>
+        <p>Your timeline contains sample entries.</p>
+        <button type="button" id="btn-remove-samples" class="btn danger">Remove sample entries</button>
+      </div>
+      <div class="row-end"><button class="btn primary" value="close">Done</button></div>
+    </form>
+  </dialog>
+
+  <script src="js/dates.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/model.js"></script>
+  <script src="js/samples.js"></script>
+  <script src="js/timeline.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
