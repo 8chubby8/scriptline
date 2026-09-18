@@ -84,6 +84,7 @@
     settings.querySelector(`input[name=era][value="${state.eraStyle}"]`).checked = true;
     $('#sample-row').hidden = !state.entries.some(e => e.sample);
     showStorageStatus();
+    showBackupStatus();
     settings.showModal();
   };
 
@@ -110,6 +111,66 @@
     for (const e of samples) await deleteEntryAndPictures(e);
     await reload();
     $('#sample-row').hidden = true;
+  };
+
+  // ---------- backup & restore ----------
+
+  async function showBackupStatus(message) {
+    const last = await SLStore.getMeta('lastBackup', null);
+    $('#backup-status').textContent = message ||
+      (last ? `Last backup saved ${fmtStamp(last)}.` : state.entries.length ? 'No backup saved yet.' : '');
+  }
+
+  $('#btn-backup').onclick = async () => {
+    if (!state.entries.length) return showBackupStatus('There are no entries to back up yet.');
+    const blob = await SLBackup.make(state.entries, { eraStyle: state.eraStyle });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `scriptline-backup-${new Date().toISOString().slice(0, 10)}.zip`;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    await SLStore.setMeta('lastBackup', new Date().toISOString());
+    showBackupStatus(`Backup saved: ${a.download} (check your Downloads folder).`);
+  };
+
+  $('#btn-restore').onclick = () => $('#restore-file').click();
+
+  $('#restore-file').onchange = async ev => {
+    const file = ev.target.files[0];
+    ev.target.value = '';
+    if (!file) return;
+    let backup;
+    try { backup = await SLBackup.read(file); } catch (err) { return showBackupStatus(err.message); }
+
+    const n = backup.entries.length;
+    const made = backup.info.created ? ` It was saved on ${fmtStamp(backup.info.created)}.` : '';
+    const have = state.entries.length;
+    $('#restore-summary').textContent = `This backup contains ${n} ${n === 1 ? 'entry' : 'entries'}.${made} ` +
+      (have ? `You currently have ${have} ${have === 1 ? 'entry' : 'entries'}. How would you like to restore?` : 'Your timeline is currently empty.');
+    const dlg = $('#restore');
+    settings.close();
+    dlg.returnValue = '';
+    dlg.showModal();
+    const mode = await new Promise(resolve => dlg.addEventListener('close', () => resolve(dlg.returnValue), { once: true }));
+    if (mode !== 'merge' && mode !== 'replace') return;
+    if (mode === 'replace' && have &&
+        !confirm(`Delete all ${have} current entries and replace them with the backup? This can't be undone.`)) return;
+
+    await SLBackup.restore(backup, mode, state.entries);
+    if (backup.info.settings && backup.info.settings.eraStyle && mode === 'replace') {
+      state.eraStyle = backup.info.settings.eraStyle;
+      timeline.eraStyle = state.eraStyle;
+      await SLStore.setMeta('eraStyle', state.eraStyle);
+    }
+    for (const url of urlCache.values()) URL.revokeObjectURL(url);
+    urlCache.clear();
+    closeOverlay();
+    await reload();
+    timeline.fitAll();
+    SLStore.keepSafe();
+    alert(`Restored ${n} ${n === 1 ? 'entry' : 'entries'} from the backup.`);
   };
 
   // ---------- list view ----------

@@ -6,7 +6,6 @@ Planned work, roughly in order. Move items to CHANGELOG.md once they're done.
 
 - Try the prototype for real and tune by feel: tier fade-in points, zoom speed, row spacing, colours.
 - Folder sync (Chrome/Edge desktop): one file per entry, plus a pictures folder.
-- Export / import as files, so data can move between devices and be backed up.
 
 ## Later
 

@@ -82,6 +82,8 @@ Decisions made and the reasoning behind them. Revisit deliberately, not by accid
 - **Optional folder sync on Chrome/Edge desktop**: one file per entry, plus a pictures folder, with pictures referenced by name rather than embedded.
 - Why one file per entry: corruption can't take everything; git gets a meaningful history ("added Hezekiah's reign") instead of one giant file changing every time; and sharing an entry is just sending that file.
 - The folder can't be the only mode — Firefox and Safari can't write to a folder — hence browser storage as the universal base with folder sync as an extra.
+- **Backup is one zip file** laid out like the sync folder: `backup.json`, `entries/<title>--<id>.json` (one per entry), `pictures/<id>.<ext>`. One download is all a browser can offer; the layout inside keeps it compatible with folder sync later. Zip handling is our own small code, so it works offline with no library.
+- **Restore asks each time**: *Merge* (keep current entries; the backup's version wins where both have the same entry) or *Replace everything* (with a second confirmation). The owner chose this over a fixed behaviour.
 - **Data carries a version stamp from the very first entry**, and the app quietly upgrades older data on load. Fields *will* be added once real entries are being written; this is what makes that cheap instead of frightening, and keeps old backups openable.
 
 ### Platform

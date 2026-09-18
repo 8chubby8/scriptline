@@ -29,7 +29,7 @@ Good to know:
 
 - **Keep the files together.** `index.html` needs the `css` and `js` folders beside it. The other files (the `.md` files) are just notes and can be ignored.
 - **Your copy won't update itself.** To get a newer version, download the ZIP again and use it to replace your old folder, keeping the same folder name and location. Your entries are kept in your browser rather than in the folder, but some browsers link them to the folder's location, so keeping the name and location the same makes sure they're still there.
-- **The website and your downloaded copy keep separate entries.** Entries made on one won't appear on the other, so it's best to pick one and stick with it.
+- **The website and your downloaded copy keep separate entries.** Entries made on one won't appear on the other. It's best to pick one and stick with it, though you can move entries between them with a backup.
 
 ## Finding your way around
 
@@ -74,6 +74,7 @@ Click **List** to see every entry as a searchable list. You can filter it by tra
 ## Settings
 
 - **Date notation:** show dates as **BCE / CE** or **BC / AD**. This only changes how dates are displayed; your entries aren't altered.
+- **Backup:** save your entries to a file, or restore them from one (see below).
 - **Remove sample entries:** clears out the examples and keeps anything you've added yourself.
 
 ## Where your entries are kept
@@ -83,8 +84,18 @@ Everything you enter is saved **in your own web browser, on your own computer**.
 This means:
 
 - your timeline stays on the computer and browser where you made it
-- **clearing your browser's data will erase your entries**
-- there's no backup or export yet. Saving to files is planned.
+- **clearing your browser's data will erase your entries**, so save backups regularly (see below)
+
+## Backing up and restoring
+
+**To save a backup:** open **Settings** and click **Save a backup**. A single file, such as `scriptline-backup-2026-09-18.zip`, goes to your Downloads folder. It holds all your entries and pictures. Keep it somewhere safe: a USB stick, cloud storage, or email it to yourself. Settings shows when you last saved one.
+
+**To restore:** open **Settings**, click **Restore from a backup…** and choose the backup file. Scriptline tells you what's in it and asks how to restore:
+
+- **Merge** puts the backup's entries back and keeps anything you've added since. Where an entry is in both, the backup's version is used. This is the safe everyday choice.
+- **Replace everything** deletes what's currently in Scriptline and puts back exactly what's in the backup. Use this when moving to a new computer or starting over.
+
+**Moving to another computer or browser:** save a backup on the old one, then restore it on the new one.
 
 ## What's coming
 

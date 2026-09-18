@@ -71,6 +71,16 @@
         <legend>Your entries</legend>
         <p id="storage-status" class="small"></p>
       </fieldset>
+      <fieldset>
+        <legend>Backup</legend>
+        <p class="small">Save all your entries and pictures to one file you can keep safe, or use to move to another computer.</p>
+        <div class="backup-actions">
+          <button type="button" id="btn-backup" class="btn primary">Save a backup</button>
+          <button type="button" id="btn-restore" class="btn">Restore from a backup…</button>
+          <input type="file" id="restore-file" accept=".zip,application/zip" hidden>
+        </div>
+        <p id="backup-status" class="muted small"></p>
+      </fieldset>
       <div id="sample-row" hidden>
         <p>Your timeline contains sample entries.</p>
         <button type="button" id="btn-remove-samples" class="btn danger">Remove sample entries</button>
@@ -79,8 +89,26 @@
     </form>
   </dialog>
 
+  <dialog id="restore" class="settings">
+    <form method="dialog">
+      <h2>Restore from a backup</h2>
+      <p id="restore-summary"></p>
+      <div class="restore-choice">
+        <button class="btn primary" value="merge">Merge</button>
+        <p class="small">Adds the backup's entries and keeps anything you've added since. Where an entry is in both, the backup's version is used.</p>
+      </div>
+      <div class="restore-choice">
+        <button class="btn danger" value="replace">Replace everything</button>
+        <p class="small">Deletes everything currently in Scriptline and puts back exactly what's in the backup. Anything added since the backup will be lost.</p>
+      </div>
+      <div class="row-end"><button class="btn" value="cancel">Cancel</button></div>
+    </form>
+  </dialog>
+
   <script src="js/dates.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/zip.js"></script>
+  <script src="js/backup.js"></script>
   <script src="js/model.js"></script>
   <script src="js/samples.js"></script>
   <script src="js/timeline.js"></script>

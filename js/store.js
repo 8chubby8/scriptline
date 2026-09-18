@@ -76,5 +76,12 @@ const SLStore = (() => {
     catch { return false; }
   }
 
-  return { DATA_VERSION, open, keepSafe, isKeptSafe, allEntries, putEntry, deleteEntry, getPicture, putPicture, deletePicture, getMeta, setMeta };
+  async function clearAll() {
+    const t = db.transaction(['entries', 'pictures'], 'readwrite');
+    t.objectStore('entries').clear();
+    t.objectStore('pictures').clear();
+    await new Promise((resolve, reject) => { t.oncomplete = resolve; t.onerror = () => reject(t.error); });
+  }
+
+  return { DATA_VERSION, open, upgrade, clearAll, keepSafe, isKeptSafe, allEntries, putEntry, deleteEntry, getPicture, putPicture, deletePicture, getMeta, setMeta };
 })();

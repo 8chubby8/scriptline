@@ -272,6 +272,12 @@ fieldset.field { border: 1px solid var(--line); border-radius: var(--radius); pa
 .settings fieldset + fieldset { margin-top: 12px; }
 .settings fieldset p { margin: 0; }
 .settings #sample-row { margin-top: 16px; }
+.backup-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+#backup-status:empty { display: none; }
+#backup-status { margin-top: 8px; }
+.restore-choice { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+.restore-choice .btn { flex: 0 0 160px; }
+.restore-choice p { margin: 0; }
 
 /* ---------- phones: list view instead of the timeline ---------- */
 
