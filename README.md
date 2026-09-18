@@ -17,6 +17,20 @@ Scriptline starts blank. You research and build your own timeline, at your own p
    - click **Add your first entry** to start your own timeline, or
    - click **Try it with sample entries** to explore with about 20 example entries. You can remove them all later from **Settings**.
 
+## Using it without the internet
+
+The link above is the easiest way to use Scriptline, and it always has the latest version. If you'd rather keep your own copy on your computer:
+
+1. At the top of this GitHub page, click the green **Code** button, then **Download ZIP**.
+2. Unzip the downloaded file. On Windows, right-click it and choose **Extract All**. Opening it without extracting won't work properly.
+3. Open the unzipped folder and double-click **`index.html`**. Scriptline opens in your web browser.
+
+Good to know:
+
+- **Keep the files together.** `index.html` needs the `css` and `js` folders beside it. The other files (the `.md` files) are just notes and can be ignored.
+- **Your copy won't update itself.** To get a newer version, download the ZIP again and use it to replace your old folder, keeping the same folder name and location. Your entries are kept in your browser rather than in the folder, but some browsers link them to the folder's location, so keeping the name and location the same makes sure they're still there.
+- **The website and your downloaded copy keep separate entries.** Entries made on one won't appear on the other, so it's best to pick one and stick with it.
+
 ## Finding your way around
 
 **Biblical history** runs across the top half of the screen and **world history** across the bottom half. A date ruler runs between them, so events from both sides that happened at the same time line up one above the other.
