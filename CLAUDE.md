@@ -105,7 +105,7 @@ Decisions made and the reasoning behind them. Revisit deliberately, not by accid
 - No build step and no dependencies: plain HTML, CSS and classic `<script>` files, so `index.html` also works when double-clicked from a downloaded copy.
 - For the project owner specifically: folder sync on Chrome → git commit to a personal repo as remote backup, rather than live API sync.
 
-## Current State (2026-09-18)
+## Current State (2026-09-19)
 
 - **Live:** https://8chubby8.github.io/scriptline/ — repo https://github.com/8chubby8/scriptline (public, GitHub Pages from `main`, root folder). Pushing to `main` updates the live site in a minute or two.
 - **Built:** the first prototype, covering everything in CHANGELOG.md — timeline, cards, edit form, list view, settings, sample entries, backup/restore, and the persistent-storage request.
