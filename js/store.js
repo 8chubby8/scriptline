@@ -61,5 +61,20 @@ const SLStore = (() => {
   }
   const setMeta = (key, value) => req(store('meta', 'readwrite').put({ key, value }));
 
-  return { DATA_VERSION, open, allEntries, putEntry, deleteEntry, getPicture, putPicture, deletePicture, getMeta, setMeta };
+  // Ask the browser to treat our data as important, so it isn't cleared when space runs low
+  // or (in Safari) after a week without a visit. Chrome decides silently; Firefox may ask the user.
+  async function keepSafe() {
+    try {
+      if (!navigator.storage || !navigator.storage.persist) return false;
+      if (await navigator.storage.persisted()) return true;
+      return await navigator.storage.persist();
+    } catch { return false; }
+  }
+
+  async function isKeptSafe() {
+    try { return !!(navigator.storage && navigator.storage.persisted && await navigator.storage.persisted()); }
+    catch { return false; }
+  }
+
+  return { DATA_VERSION, open, keepSafe, isKeptSafe, allEntries, putEntry, deleteEntry, getPicture, putPicture, deletePicture, getMeta, setMeta };
 })();

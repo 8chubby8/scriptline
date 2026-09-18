@@ -14,3 +14,4 @@
 - Everything saved in the browser (IndexedDB), with a data version stamp for future upgrades.
 - Optional sample entries on first run, removable from Settings.
 - Published on GitHub Pages: https://8chubby8.github.io/scriptline/
+- Asks the browser to keep entries safe from automatic clearing; Settings shows whether it has agreed.

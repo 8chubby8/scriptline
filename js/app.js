@@ -83,8 +83,15 @@
   $('#btn-settings').onclick = () => {
     settings.querySelector(`input[name=era][value="${state.eraStyle}"]`).checked = true;
     $('#sample-row').hidden = !state.entries.some(e => e.sample);
+    showStorageStatus();
     settings.showModal();
   };
+
+  async function showStorageStatus() {
+    $('#storage-status').textContent = (await SLStore.isKeptSafe())
+      ? 'Your browser has agreed to keep your entries safe. It won\'t clear them to save space.'
+      : 'Your browser hasn\'t yet agreed to keep your entries safe, so it could clear them if it runs low on space. Using Scriptline regularly usually earns this. Either way, clearing your browsing data will still erase them.';
+  }
   settings.addEventListener('change', async ev => {
     if (ev.target.name !== 'era') return;
     state.eraStyle = ev.target.value;
@@ -520,6 +527,7 @@
     d.sources = d.sources.filter(s => s.text || s.url);
     d.updated = new Date().toISOString();
     await SLStore.putEntry(d);
+    SLStore.keepSafe();
 
     // A family always shares one track.
     for (const id of SLModel.descendantIds(d.id, state.entries)) {
@@ -561,6 +569,7 @@
         e.notes.push({ id: SLModel.newId(), at: new Date().toISOString(), text });
         e.updated = new Date().toISOString();
         await SLStore.putEntry(e);
+        SLStore.keepSafe();
         await reload();
         return openCard(e.id);
       }
